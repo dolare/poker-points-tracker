@@ -26,6 +26,7 @@ function logout() {
           <router-link to="/games" class="nav-link">Games</router-link>
           
           <template v-if="authStore.isAdmin">
+            <router-link to="/admin/players" class="nav-link admin-link">Players</router-link>
             <router-link to="/admin/templates" class="nav-link admin-link">Templates</router-link>
             <router-link to="/admin/games" class="nav-link admin-link">Manage Games</router-link>
           </template>
@@ -39,8 +40,7 @@ function logout() {
         </template>
         
         <template v-else>
-          <router-link to="/login" class="nav-link">Login</router-link>
-          <router-link to="/register" class="nav-link btn-register">Register</router-link>
+          <router-link to="/login" class="nav-link btn-login">Login</router-link>
         </template>
       </div>
     </div>
@@ -123,14 +123,14 @@ function logout() {
   color: #fff;
 }
 
-.btn-register {
+.btn-login {
   background: #4299e1;
   color: #fff !important;
   padding: 0.5rem 1rem;
   border-radius: 4px;
 }
 
-.btn-register:hover {
+.btn-login:hover {
   background: #3182ce;
 }
 </style>

@@ -63,8 +63,7 @@ async function handleSubmit() {
       </form>
       
       <p class="auth-footer">
-        Don't have an account?
-        <router-link to="/register">Create one</router-link>
+        Don't have an account? Contact the admin to get access.
       </p>
     </div>
   </div>

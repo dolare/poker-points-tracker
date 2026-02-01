@@ -107,34 +107,9 @@ function requireAdmin(req, res, next) {
 }
 
 // Auth routes
+// Public registration is DISABLED - only admins can add players
 app.post('/api/auth/register', (req, res) => {
-  try {
-    const { name, email, password } = req.body
-    
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'All fields are required' })
-    }
-
-    const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email)
-    if (existing) {
-      return res.status(400).json({ message: 'Email already registered' })
-    }
-
-    const hashedPassword = bcrypt.hashSync(password, 10)
-    const result = db.prepare('INSERT INTO users (name, email, password) VALUES (?, ?, ?)').run(
-      name,
-      email,
-      hashedPassword
-    )
-
-    const user = db.prepare('SELECT id, name, email, role, createdAt FROM users WHERE id = ?').get(result.lastInsertRowid)
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' })
-
-    res.json({ token, user })
-  } catch (error) {
-    console.error('Register error:', error)
-    res.status(500).json({ message: 'Registration failed' })
-  }
+  return res.status(403).json({ message: 'Public registration is disabled. Contact admin to create an account.' })
 })
 
 app.post('/api/auth/login', (req, res) => {
@@ -213,6 +188,81 @@ app.delete('/api/templates/:id', authenticate, requireAdmin, (req, res) => {
 app.get('/api/players', authenticate, (req, res) => {
   const players = db.prepare('SELECT id, name, email, role, createdAt FROM users ORDER BY name').all()
   res.json(players)
+})
+
+// Admin: Create new player
+app.post('/api/players', authenticate, requireAdmin, (req, res) => {
+  try {
+    const { name, email, password } = req.body
+    
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Name, email, and password are required' })
+    }
+
+    const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email)
+    if (existing) {
+      return res.status(400).json({ message: 'Email already registered' })
+    }
+
+    const hashedPassword = bcrypt.hashSync(password, 10)
+    const result = db.prepare('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)').run(
+      name,
+      email,
+      hashedPassword,
+      'player'
+    )
+
+    const player = db.prepare('SELECT id, name, email, role, createdAt FROM users WHERE id = ?').get(result.lastInsertRowid)
+    res.json(player)
+  } catch (error) {
+    console.error('Create player error:', error)
+    res.status(500).json({ message: 'Failed to create player' })
+  }
+})
+
+// Admin: Update player
+app.put('/api/players/:id', authenticate, requireAdmin, (req, res) => {
+  const { name, password } = req.body
+  const playerId = req.params.id
+
+  // Don't allow editing other admins
+  const player = db.prepare('SELECT * FROM users WHERE id = ?').get(playerId)
+  if (!player) {
+    return res.status(404).json({ message: 'Player not found' })
+  }
+
+  if (name) {
+    db.prepare('UPDATE users SET name = ? WHERE id = ?').run(name, playerId)
+  }
+  
+  if (password) {
+    const hashedPassword = bcrypt.hashSync(password, 10)
+    db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hashedPassword, playerId)
+  }
+
+  const updatedPlayer = db.prepare('SELECT id, name, email, role, createdAt FROM users WHERE id = ?').get(playerId)
+  res.json(updatedPlayer)
+})
+
+// Admin: Delete player
+app.delete('/api/players/:id', authenticate, requireAdmin, (req, res) => {
+  const playerId = req.params.id
+  
+  const player = db.prepare('SELECT * FROM users WHERE id = ?').get(playerId)
+  if (!player) {
+    return res.status(404).json({ message: 'Player not found' })
+  }
+  
+  // Don't allow deleting admins
+  if (player.role === 'admin') {
+    return res.status(403).json({ message: 'Cannot delete admin users' })
+  }
+
+  // Delete player from games first
+  db.prepare('DELETE FROM game_players WHERE playerId = ?').run(playerId)
+  db.prepare('DELETE FROM users WHERE id = ?').run(playerId)
+  
+  res.json({ success: true })
 })
 
 // Games routes

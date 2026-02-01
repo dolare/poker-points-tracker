@@ -11,8 +11,8 @@ const authStore = useAuthStore()
       <p class="subtitle">Track scores and points across all your poker and board game sessions</p>
       
       <div class="cta-buttons" v-if="!authStore.isAuthenticated">
-        <router-link to="/register" class="btn btn-primary">Get Started</router-link>
-        <router-link to="/login" class="btn btn-secondary">Sign In</router-link>
+        <router-link to="/login" class="btn btn-primary">Sign In</router-link>
+        <router-link to="/leaderboard" class="btn btn-secondary">View Leaderboard</router-link>
       </div>
       <div class="cta-buttons" v-else>
         <router-link to="/dashboard" class="btn btn-primary">Go to Dashboard</router-link>

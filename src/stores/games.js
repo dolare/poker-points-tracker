@@ -40,6 +40,24 @@ export const useGamesStore = defineStore('games', () => {
     return response.data
   }
 
+  async function createPlayer(playerData) {
+    const response = await api.post('/players', playerData)
+    players.value.push(response.data)
+    return response.data
+  }
+
+  async function updatePlayer(id, playerData) {
+    const response = await api.put(`/players/${id}`, playerData)
+    const index = players.value.findIndex(p => p.id === id)
+    if (index !== -1) players.value[index] = response.data
+    return response.data
+  }
+
+  async function deletePlayer(id) {
+    await api.delete(`/players/${id}`)
+    players.value = players.value.filter(p => p.id !== id)
+  }
+
   // Games
   async function fetchGames() {
     const response = await api.get('/games')
@@ -101,6 +119,9 @@ export const useGamesStore = defineStore('games', () => {
     updateTemplate,
     deleteTemplate,
     fetchPlayers,
+    createPlayer,
+    updatePlayer,
+    deletePlayer,
     fetchGames,
     fetchGame,
     createGame,

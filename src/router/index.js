@@ -14,10 +14,9 @@ const routes = [
     meta: { guest: true }
   },
   {
+    // Registration disabled - redirect to login
     path: '/register',
-    name: 'Register',
-    component: () => import('../views/Register.vue'),
-    meta: { guest: true }
+    redirect: '/login'
   },
   {
     path: '/dashboard',
@@ -53,6 +52,12 @@ const routes = [
     path: '/admin/games',
     name: 'AdminGames',
     component: () => import('../views/admin/AdminGames.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/players',
+    name: 'AdminPlayers',
+    component: () => import('../views/admin/Players.vue'),
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
