@@ -10,11 +10,13 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 const app = express()
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 const JWT_SECRET = process.env.JWT_SECRET || 'poker-points-secret-key-change-in-production'
 
-// Database setup
-const db = new Database(join(__dirname, 'poker.db'))
+// Database setup - use DB_PATH env var for production (persistent disk)
+const dbPath = process.env.DB_PATH || join(__dirname, 'poker.db')
+console.log(`Database location: ${dbPath}`)
+const db = new Database(dbPath)
 db.pragma('journal_mode = WAL')
 
 // Initialize database tables
@@ -494,6 +496,21 @@ app.get('/api/leaderboard', (req, res) => {
 
   res.json(rankedLeaderboard)
 })
+
+// Serve Vue frontend in production
+if (process.env.NODE_ENV === 'production') {
+  const distPath = join(__dirname, '..', 'dist')
+  
+  // Serve static files from the Vue build
+  app.use(express.static(distPath))
+  
+  // Handle Vue Router - serve index.html for all non-API routes
+  app.get('*', (req, res) => {
+    res.sendFile(join(distPath, 'index.html'))
+  })
+  
+  console.log(`Serving frontend from ${distPath}`)
+}
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)

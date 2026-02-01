@@ -1,0 +1,24 @@
+# Render Blueprint - Infrastructure as Code
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: poker-points-tracker
+    runtime: node
+    region: oregon  # or singapore, frankfurt, ohio
+    plan: free      # free, starter, standard, pro
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: JWT_SECRET
+        generateValue: true  # Render generates a secure random value
+      - key: DB_PATH
+        value: /var/data/poker.db
+    disk:
+      name: poker-data
+      mountPath: /var/data
+      sizeGB: 1  # 1GB is plenty for SQLite
