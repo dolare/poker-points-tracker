@@ -6,7 +6,7 @@ services:
     name: poker-points-tracker
     runtime: node
     region: oregon  # or singapore, frankfurt, ohio
-    plan: free      # free, starter, standard, pro
+    plan: starter   # starter plan required for disk storage ($7/mo)
     buildCommand: npm install && npm run build
     startCommand: npm run start
     envVars:
