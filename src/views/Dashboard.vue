@@ -9,6 +9,10 @@ const gamesStore = useGamesStore()
 const recentGames = ref([])
 const playerStats = ref(null)
 const loading = ref(true)
+const githubToken = ref('')
+const tokenError = ref('')
+const tokenSuccess = ref('')
+const savingToken = ref(false)
 
 onMounted(async () => {
   try {
@@ -27,6 +31,24 @@ onMounted(async () => {
 
 const totalPoints = computed(() => playerStats.value?.totalPoints || 0)
 const gamesPlayed = computed(() => playerStats.value?.gamesPlayed || 0)
+
+async function saveGitHubToken() {
+  if (!githubToken.value) return
+  
+  tokenError.value = ''
+  tokenSuccess.value = ''
+  savingToken.value = true
+  
+  try {
+    await authStore.setGitHubToken(githubToken.value)
+    tokenSuccess.value = 'GitHub token saved! You now have write access.'
+    githubToken.value = ''
+  } catch (err) {
+    tokenError.value = err.message || 'Failed to save token'
+  } finally {
+    savingToken.value = false
+  }
+}
 </script>
 
 <template>
@@ -88,6 +110,37 @@ const gamesPlayed = computed(() => playerStats.value?.gamesPlayed || 0)
             📋 Manage Templates
           </router-link>
         </div>
+      </section>
+
+      <!-- GitHub Token Setup for Admin -->
+      <section v-if="authStore.isAdmin" class="github-section">
+        <h2>🔑 GitHub Write Access</h2>
+        <p v-if="authStore.hasWriteAccess" class="write-status success">
+          ✅ Write access enabled
+        </p>
+        <template v-else>
+          <p class="write-status warning">
+            ⚠️ Read-only mode. Enter your GitHub token to make changes.
+          </p>
+          <div class="token-form">
+            <input 
+              type="password" 
+              v-model="githubToken" 
+              placeholder="ghp_xxxxxxxxxxxx"
+              class="token-input"
+            />
+            <button @click="saveGitHubToken" :disabled="savingToken" class="btn-save">
+              {{ savingToken ? 'Saving...' : 'Save Token' }}
+            </button>
+          </div>
+          <p class="token-help">
+            <a href="https://github.com/settings/tokens/new?scopes=repo&description=Poker%20Points%20Tracker" target="_blank">
+              Generate a token here
+            </a> (select "repo" scope)
+          </p>
+        </template>
+        <div v-if="tokenError" class="error-message">{{ tokenError }}</div>
+        <div v-if="tokenSuccess" class="success-message">{{ tokenSuccess }}</div>
       </section>
     </div>
   </div>
@@ -257,5 +310,91 @@ const gamesPlayed = computed(() => playerStats.value?.gamesPlayed || 0)
 
 .admin-btn:hover {
   background: #4a5568;
+}
+
+.github-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #2d3748;
+  border-radius: 12px;
+}
+
+.github-section h2 {
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.write-status {
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.write-status.success {
+  background: #c6f6d5;
+  color: #22543d;
+}
+
+.write-status.warning {
+  background: #fefcbf;
+  color: #744210;
+}
+
+.token-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.token-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #4a5568;
+  border-radius: 8px;
+  background: #1a202c;
+  color: #fff;
+}
+
+.token-input:focus {
+  outline: none;
+  border-color: #4299e1;
+}
+
+.btn-save {
+  padding: 0.75rem 1.5rem;
+  background: #4299e1;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-save:disabled {
+  opacity: 0.7;
+}
+
+.token-help {
+  font-size: 0.875rem;
+  color: #a0aec0;
+}
+
+.token-help a {
+  color: #4299e1;
+}
+
+.error-message {
+  background: #fed7d7;
+  color: #c53030;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+.success-message {
+  background: #c6f6d5;
+  color: #22543d;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
 }
 </style>

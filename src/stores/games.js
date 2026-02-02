@@ -1,112 +1,306 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import api from '../services/api'
+import { ref, computed } from 'vue'
+import { useAuthStore } from './auth'
 
 export const useGamesStore = defineStore('games', () => {
-  const games = ref([])
+  const authStore = useAuthStore()
+  
   const currentGame = ref(null)
-  const templates = ref([])
-  const players = ref([])
+
+  // Computed properties that read from auth store's data
+  const games = computed(() => authStore.data?.games || [])
+  const templates = computed(() => authStore.data?.templates || [])
+  const players = computed(() => authStore.data?.players || [])
+
+  // Helper to save data after modifications
+  async function saveData() {
+    await authStore.saveData()
+  }
 
   // Templates
   async function fetchTemplates() {
-    const response = await api.get('/templates')
-    templates.value = response.data
-    return response.data
+    await authStore.loadData()
+    return templates.value
   }
 
   async function createTemplate(template) {
-    const response = await api.post('/templates', template)
-    templates.value.push(response.data)
-    return response.data
+    if (!authStore.data) await authStore.loadData()
+    
+    const newTemplate = {
+      id: authStore.data.nextIds.template++,
+      name: template.name,
+      basePoints: template.basePoints,
+      createdAt: new Date().toISOString()
+    }
+    
+    authStore.data.templates.push(newTemplate)
+    await saveData()
+    return newTemplate
   }
 
   async function updateTemplate(id, template) {
-    const response = await api.put(`/templates/${id}`, template)
-    const index = templates.value.findIndex(t => t.id === id)
-    if (index !== -1) templates.value[index] = response.data
-    return response.data
+    if (!authStore.data) await authStore.loadData()
+    
+    const index = authStore.data.templates.findIndex(t => t.id === id)
+    if (index !== -1) {
+      authStore.data.templates[index] = { 
+        ...authStore.data.templates[index], 
+        ...template 
+      }
+      await saveData()
+      return authStore.data.templates[index]
+    }
   }
 
   async function deleteTemplate(id) {
-    await api.delete(`/templates/${id}`)
-    templates.value = templates.value.filter(t => t.id !== id)
+    if (!authStore.data) await authStore.loadData()
+    
+    authStore.data.templates = authStore.data.templates.filter(t => t.id !== id)
+    await saveData()
   }
 
   // Players
   async function fetchPlayers() {
-    const response = await api.get('/players')
-    players.value = response.data
-    return response.data
+    await authStore.loadData()
+    return players.value
   }
 
   async function createPlayer(playerData) {
-    const response = await api.post('/players', playerData)
-    players.value.push(response.data)
-    return response.data
+    if (!authStore.data) await authStore.loadData()
+    
+    // Check if email exists
+    if (authStore.data.players.some(p => p.email === playerData.email)) {
+      throw new Error('Email already registered')
+    }
+    
+    const newPlayer = {
+      id: authStore.data.nextIds.player++,
+      name: playerData.name,
+      email: playerData.email,
+      role: 'player',
+      createdAt: new Date().toISOString()
+    }
+    
+    // Store password for player (simple approach)
+    if (playerData.password) {
+      newPlayer.password = playerData.password
+    }
+    
+    authStore.data.players.push(newPlayer)
+    await saveData()
+    return newPlayer
   }
 
   async function updatePlayer(id, playerData) {
-    const response = await api.put(`/players/${id}`, playerData)
-    const index = players.value.findIndex(p => p.id === id)
-    if (index !== -1) players.value[index] = response.data
-    return response.data
+    if (!authStore.data) await authStore.loadData()
+    
+    const index = authStore.data.players.findIndex(p => p.id === id)
+    if (index !== -1) {
+      if (playerData.name) {
+        authStore.data.players[index].name = playerData.name
+      }
+      if (playerData.password) {
+        authStore.data.players[index].password = playerData.password
+      }
+      await saveData()
+      return authStore.data.players[index]
+    }
   }
 
   async function deletePlayer(id) {
-    await api.delete(`/players/${id}`)
-    players.value = players.value.filter(p => p.id !== id)
+    if (!authStore.data) await authStore.loadData()
+    
+    const player = authStore.data.players.find(p => p.id === id)
+    if (player?.role === 'admin') {
+      throw new Error('Cannot delete admin')
+    }
+    
+    // Remove from games
+    authStore.data.games.forEach(game => {
+      game.players = game.players?.filter(p => p.id !== id) || []
+    })
+    
+    authStore.data.players = authStore.data.players.filter(p => p.id !== id)
+    await saveData()
   }
 
   // Games
   async function fetchGames() {
-    const response = await api.get('/games')
-    games.value = response.data
-    return response.data
+    await authStore.loadData()
+    return games.value
   }
 
   async function fetchGame(id) {
-    const response = await api.get(`/games/${id}`)
-    currentGame.value = response.data
-    return response.data
+    await authStore.loadData()
+    
+    const game = authStore.data.games.find(g => g.id === parseInt(id))
+    if (game) {
+      // Enrich with template info
+      const template = authStore.data.templates.find(t => t.id === game.templateId)
+      currentGame.value = {
+        ...game,
+        templateName: template?.name || 'Custom',
+        basePoints: template?.basePoints || 0
+      }
+    }
+    return currentGame.value
   }
 
   async function createGame(gameData) {
-    const response = await api.post('/games', gameData)
-    games.value.unshift(response.data)
-    return response.data
+    if (!authStore.data) await authStore.loadData()
+    
+    const template = authStore.data.templates.find(t => t.id === gameData.templateId)
+    
+    const newGame = {
+      id: authStore.data.nextIds.game++,
+      name: gameData.name,
+      templateId: gameData.templateId,
+      status: 'active',
+      createdAt: new Date().toISOString(),
+      players: []
+    }
+    
+    // Add initial players with base points
+    if (gameData.playerIds && gameData.playerIds.length > 0) {
+      for (const playerId of gameData.playerIds) {
+        const player = authStore.data.players.find(p => p.id === playerId)
+        if (player) {
+          newGame.players.push({
+            id: player.id,
+            name: player.name,
+            score: template?.basePoints || 0
+          })
+        }
+      }
+    }
+    
+    authStore.data.games.unshift(newGame)
+    await saveData()
+    
+    return {
+      ...newGame,
+      templateName: template?.name,
+      basePoints: template?.basePoints,
+      playerCount: newGame.players.length
+    }
   }
 
   async function addPlayerToGame(gameId, playerId) {
-    const response = await api.post(`/games/${gameId}/players`, { playerId })
-    if (currentGame.value?.id === gameId) {
-      currentGame.value = response.data
+    if (!authStore.data) await authStore.loadData()
+    
+    const gameIndex = authStore.data.games.findIndex(g => g.id === parseInt(gameId))
+    if (gameIndex === -1) throw new Error('Game not found')
+    
+    const game = authStore.data.games[gameIndex]
+    if (game.status !== 'active') throw new Error('Game is not active')
+    
+    const player = authStore.data.players.find(p => p.id === parseInt(playerId))
+    if (!player) throw new Error('Player not found')
+    
+    if (game.players.some(p => p.id === player.id)) {
+      throw new Error('Player already in game')
     }
-    return response.data
+    
+    const template = authStore.data.templates.find(t => t.id === game.templateId)
+    
+    game.players.push({
+      id: player.id,
+      name: player.name,
+      score: template?.basePoints || 0
+    })
+    
+    await saveData()
+    
+    currentGame.value = {
+      ...game,
+      templateName: template?.name,
+      basePoints: template?.basePoints
+    }
+    
+    return currentGame.value
   }
 
   async function updatePlayerScore(gameId, playerId, score) {
-    const response = await api.put(`/games/${gameId}/players/${playerId}`, { score })
-    if (currentGame.value?.id === gameId) {
-      currentGame.value = response.data
+    if (!authStore.data) await authStore.loadData()
+    
+    const game = authStore.data.games.find(g => g.id === parseInt(gameId))
+    if (!game) throw new Error('Game not found')
+    
+    const playerInGame = game.players.find(p => p.id === parseInt(playerId))
+    if (!playerInGame) throw new Error('Player not in game')
+    
+    playerInGame.score = score
+    
+    await saveData()
+    
+    const template = authStore.data.templates.find(t => t.id === game.templateId)
+    currentGame.value = {
+      ...game,
+      templateName: template?.name,
+      basePoints: template?.basePoints
     }
-    return response.data
+    
+    return currentGame.value
   }
 
   async function endGame(gameId) {
-    const response = await api.put(`/games/${gameId}/end`)
-    if (currentGame.value?.id === gameId) {
-      currentGame.value = response.data
+    if (!authStore.data) await authStore.loadData()
+    
+    const game = authStore.data.games.find(g => g.id === parseInt(gameId))
+    if (!game) throw new Error('Game not found')
+    
+    game.status = 'ended'
+    game.endedAt = new Date().toISOString()
+    
+    await saveData()
+    
+    const template = authStore.data.templates.find(t => t.id === game.templateId)
+    currentGame.value = {
+      ...game,
+      templateName: template?.name,
+      basePoints: template?.basePoints
     }
-    const index = games.value.findIndex(g => g.id === gameId)
-    if (index !== -1) games.value[index] = response.data
-    return response.data
+    
+    return currentGame.value
   }
 
   // Leaderboard
   async function fetchLeaderboard() {
-    const response = await api.get('/leaderboard')
-    return response.data
+    await authStore.loadData()
+    
+    const playerScores = {}
+    
+    // Initialize all players
+    authStore.data.players.forEach(player => {
+      playerScores[player.id] = {
+        id: player.id,
+        name: player.name,
+        totalPoints: 0,
+        gamesPlayed: 0
+      }
+    })
+    
+    // Calculate scores from ended games
+    authStore.data.games
+      .filter(game => game.status === 'ended')
+      .forEach(game => {
+        game.players.forEach(player => {
+          if (playerScores[player.id]) {
+            playerScores[player.id].totalPoints += player.score
+            playerScores[player.id].gamesPlayed++
+          }
+        })
+      })
+    
+    // Sort by total points and add rank
+    const leaderboard = Object.values(playerScores)
+      .sort((a, b) => b.totalPoints - a.totalPoints)
+      .map((player, index) => ({
+        ...player,
+        rank: index + 1
+      }))
+    
+    return leaderboard
   }
 
   return {

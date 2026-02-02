@@ -1,151 +1,101 @@
 # Poker Points Tracker
 
-A Vue 3 application for tracking poker and board game scores across multiple players and sessions.
+A Vue 3 application for tracking poker and board game scores. **100% free hosting** using GitHub Pages and GitHub as the database.
 
 ## Features
 
-- **Player Management**: Players can register, login, and update their display names
-- **Permanent Score Storage**: All scores stored in SQLite database
-- **Game Templates**: Create reusable templates with preset base points
-- **Game Sessions**: Admins can start games, add players, and track scores
-- **Leaderboard**: View all-time rankings across all completed games
-- **Admin Controls**: Full game management capabilities for admins
+- **Player Management**: Admin can add/edit/remove players
+- **Permanent Score Storage**: Data stored in GitHub repository (JSON)
+- **Game Templates**: Create templates with preset base points
+- **Game Sessions**: Track scores for each game session
+- **Leaderboard**: View all-time rankings
 
-## Tech Stack
+## Architecture
 
-- **Frontend**: Vue 3 + Vite + Vue Router + Pinia
-- **Backend**: Express.js + SQLite (better-sqlite3)
-- **Auth**: JWT-based authentication
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- npm
-
-### Installation
-
-1. Install dependencies:
-
-```bash
-npm install --registry https://registry.npmjs.org
+```
+┌─────────────────────────────────────────────┐
+│           GitHub Pages (Free)               │
+│           Static Vue.js App                 │
+└─────────────────┬───────────────────────────┘
+                  │ GitHub API
+                  ▼
+┌─────────────────────────────────────────────┐
+│           GitHub Repository                 │
+│           data/db.json (Database)           │
+└─────────────────────────────────────────────┘
 ```
 
-2. Start both frontend and backend:
+**No backend servers required!** Data is stored directly in the repository.
 
-```bash
-npm run dev:all
-```
+## Live Demo
 
-3. Open your browser:
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:3001
+https://dolare.github.io/poker-points-tracker/
 
-### Default Admin Account
+## Default Login
 
-On first run, a default admin account is created:
 - **Email**: admin@poker.com
 - **Password**: admin123
 
-**Important**: Change these credentials in production!
+## Setup for Admin (Write Access)
 
-### Default Game Templates
+To make changes (add players, start games, update scores):
 
-Three templates are created automatically:
-- Texas Hold'em (1000 base points)
-- Omaha (1500 base points)
-- Board Game Night (100 base points)
+1. Login as admin
+2. Go to Dashboard
+3. Generate a [GitHub Personal Access Token](https://github.com/settings/tokens/new?scopes=repo&description=Poker%20Points%20Tracker) with `repo` scope
+4. Enter the token in the Dashboard
+5. Now you can make changes!
 
-## Available Scripts
+## Local Development
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start frontend only |
-| `npm run server` | Start backend only |
-| `npm run dev:all` | Start both frontend and backend |
-| `npm run build` | Build for production |
-| `npm run preview` | Preview production build |
+```bash
+# Install dependencies
+npm install
+
+# Start dev server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+## Deployment
+
+The app auto-deploys to GitHub Pages when you push to `main`:
+
+1. Go to repo Settings → Pages
+2. Set Source to "GitHub Actions"
+3. Push to `main` - it will deploy automatically
 
 ## Project Structure
 
 ```
-├── public/              # Static assets
-├── server/
-│   └── index.js         # Express backend + SQLite
+├── .github/workflows/   # GitHub Actions for auto-deploy
+├── data/
+│   └── db.json          # Database (JSON)
 ├── src/
-│   ├── assets/          # Images, fonts
-│   ├── components/      # Reusable Vue components
-│   │   └── Navbar.vue
-│   ├── router/          # Vue Router configuration
-│   │   └── index.js
-│   ├── services/        # API service layer
-│   │   └── api.js
-│   ├── stores/          # Pinia state stores
-│   │   ├── auth.js
-│   │   └── games.js
-│   ├── views/           # Page components
-│   │   ├── admin/       # Admin-only pages
-│   │   ├── Dashboard.vue
-│   │   ├── GameDetail.vue
-│   │   ├── Games.vue
-│   │   ├── Home.vue
-│   │   ├── Leaderboard.vue
-│   │   ├── Login.vue
-│   │   ├── Profile.vue
-│   │   └── Register.vue
-│   ├── App.vue          # Root component
-│   ├── main.js          # Entry point
-│   └── style.css        # Global styles
-├── index.html
-├── package.json
-└── vite.config.js
+│   ├── components/      # Vue components
+│   ├── router/          # Vue Router
+│   ├── services/        # GitHub API service
+│   ├── stores/          # Pinia stores
+│   └── views/           # Page components
+└── package.json
 ```
 
-## API Endpoints
+## Tech Stack
 
-### Authentication
-- `POST /api/auth/register` - Register new player
-- `POST /api/auth/login` - Login
-- `GET /api/auth/me` - Get current user
-- `PUT /api/auth/profile` - Update profile name
+- [Vue 3](https://vuejs.org/) - Frontend framework
+- [Vite](https://vitejs.dev/) - Build tool
+- [Pinia](https://pinia.vuejs.org/) - State management
+- [GitHub API](https://docs.github.com/rest) - Data storage
+- [GitHub Pages](https://pages.github.com/) - Free hosting
 
-### Templates (Admin only for create/update/delete)
-- `GET /api/templates` - List all templates
-- `POST /api/templates` - Create template
-- `PUT /api/templates/:id` - Update template
-- `DELETE /api/templates/:id` - Delete template
+## Cost
 
-### Players
-- `GET /api/players` - List all players
+**$0/month** - Everything is free!
 
-### Games
-- `GET /api/games` - List all games
-- `GET /api/games/:id` - Get game details
-- `POST /api/games` - Create new game (Admin)
-- `POST /api/games/:id/players` - Add player to game (Admin)
-- `PUT /api/games/:id/players/:playerId` - Update player score (Admin)
-- `PUT /api/games/:id/end` - End game (Admin)
-
-### Leaderboard
-- `GET /api/leaderboard` - Get all-time rankings
-
-## User Roles
-
-| Feature | Player | Admin |
-|---------|--------|-------|
-| Register/Login | ✓ | ✓ |
-| Update own profile | ✓ | ✓ |
-| View games | ✓ | ✓ |
-| View leaderboard | ✓ | ✓ |
-| Create/Edit templates | ✗ | ✓ |
-| Start new games | ✗ | ✓ |
-| Add players to games | ✗ | ✓ |
-| Update scores | ✗ | ✓ |
-| End games | ✗ | ✓ |
-
-## Notes
-
-- Players cannot be removed from a game once added
-- Scores are only counted toward leaderboard when a game is ended
-- The SQLite database file is stored at `server/poker.db`
+| Service | Cost |
+|---------|------|
+| GitHub Pages | Free |
+| GitHub API | Free |
+| Data Storage | Free (in repo) |

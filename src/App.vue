@@ -1,13 +1,16 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useAuthStore } from './stores/auth'
 import Navbar from './components/Navbar.vue'
 
 const authStore = useAuthStore()
+const loading = ref(true)
 
 onMounted(async () => {
-  if (authStore.token) {
-    await authStore.fetchUser()
+  try {
+    await authStore.checkAuth()
+  } finally {
+    loading.value = false
   }
 })
 </script>
@@ -16,7 +19,10 @@ onMounted(async () => {
   <div class="app">
     <Navbar />
     <main class="main-content">
-      <router-view />
+      <div v-if="loading" class="loading-screen">
+        <p>Loading...</p>
+      </div>
+      <router-view v-else />
     </main>
   </div>
 </template>

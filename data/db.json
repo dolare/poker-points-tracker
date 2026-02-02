@@ -1,0 +1,25 @@
+{
+  "admin": {
+    "password": "admin123"
+  },
+  "players": [
+    {
+      "id": 1,
+      "name": "Admin",
+      "email": "admin@poker.com",
+      "role": "admin",
+      "createdAt": "2026-02-01T00:00:00.000Z"
+    }
+  ],
+  "templates": [
+    { "id": 1, "name": "Texas Hold'em", "basePoints": 1000, "createdAt": "2026-02-01T00:00:00.000Z" },
+    { "id": 2, "name": "Omaha", "basePoints": 1500, "createdAt": "2026-02-01T00:00:00.000Z" },
+    { "id": 3, "name": "Board Game Night", "basePoints": 100, "createdAt": "2026-02-01T00:00:00.000Z" }
+  ],
+  "games": [],
+  "nextIds": {
+    "player": 2,
+    "template": 4,
+    "game": 1
+  }
+}
