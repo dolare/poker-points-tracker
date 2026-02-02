@@ -3,9 +3,18 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Theme variables - will be dynamically updated */
+  --color-primary: #4299e1;
+  --color-secondary: #3182ce;
+  --color-background: #1a202c;
+  --color-surface: #2d3748;
+  --color-surface-light: #4a5568;
+  --color-text: #ffffff;
+  --color-text-secondary: #a0aec0;
+  --color-success: #48bb78;
+  --color-warning: #ed8936;
+  --color-error: #f56565;
+  --color-accent: #9f7aea;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,27 +22,27 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-text);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+a {
+  font-weight: 500;
+  color: var(--color-primary);
+  text-decoration: inherit;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--color-secondary);
 }
 
 button {
@@ -43,33 +52,29 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.25s;
 }
 
-button:hover {
-  border-color: #646cff;
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text);
 }
 
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
 
-.card {
-  padding: 2em;
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-light);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
 }

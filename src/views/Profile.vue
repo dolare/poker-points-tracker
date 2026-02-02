@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useAuthStore } from '../stores/auth'
+import ThemeSelector from '../components/ThemeSelector.vue'
 
 const authStore = useAuthStore()
 
@@ -18,7 +19,7 @@ async function handleSubmit() {
     await authStore.updateProfile(name.value)
     message.value = 'Profile updated successfully!'
   } catch (err) {
-    error.value = err.response?.data?.message || 'Failed to update profile'
+    error.value = err.message || 'Failed to update profile'
   } finally {
     loading.value = false
   }
@@ -76,6 +77,9 @@ async function handleSubmit() {
           </span>
         </div>
       </div>
+
+      <!-- Theme Selector -->
+      <ThemeSelector />
     </div>
   </div>
 </template>
@@ -87,7 +91,7 @@ async function handleSubmit() {
 }
 
 .profile-card {
-  background: #2d3748;
+  background: var(--color-surface);
   padding: 2.5rem;
   border-radius: 16px;
   width: 100%;
@@ -95,7 +99,7 @@ async function handleSubmit() {
 }
 
 .profile-card h2 {
-  color: #fff;
+  color: var(--color-text);
   margin-bottom: 2rem;
 }
 
@@ -112,22 +116,23 @@ async function handleSubmit() {
 }
 
 .form-group label {
-  color: #e2e8f0;
+  color: var(--color-text);
   font-weight: 500;
 }
 
 .form-group input {
   padding: 0.75rem 1rem;
-  border: 2px solid #4a5568;
+  border: 2px solid var(--color-surface-light);
   border-radius: 8px;
-  background: #1a202c;
-  color: #fff;
+  background: var(--color-background);
+  color: var(--color-text);
   font-size: 1rem;
+  transition: border-color 0.2s;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #4299e1;
+  border-color: var(--color-primary);
 }
 
 .form-group input.disabled {
@@ -136,33 +141,34 @@ async function handleSubmit() {
 }
 
 .help-text {
-  color: #718096;
+  color: var(--color-text-secondary);
   font-size: 0.875rem;
 }
 
 .error-message {
-  background: #fed7d7;
-  color: #c53030;
+  background: var(--color-error);
+  color: white;
   padding: 0.75rem;
   border-radius: 8px;
 }
 
 .success-message {
-  background: #c6f6d5;
-  color: #22543d;
+  background: var(--color-success);
+  color: white;
   padding: 0.75rem;
   border-radius: 8px;
 }
 
 .btn-submit {
-  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-  color: #fff;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  color: white;
   padding: 0.875rem;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
+  transition: transform 0.2s;
 }
 
 .btn-submit:hover:not(:disabled) {
@@ -177,11 +183,11 @@ async function handleSubmit() {
 .profile-stats {
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #4a5568;
+  border-top: 1px solid var(--color-surface-light);
 }
 
 .profile-stats h3 {
-  color: #a0aec0;
+  color: var(--color-text-secondary);
   font-size: 1rem;
   margin-bottom: 1rem;
 }
@@ -190,11 +196,11 @@ async function handleSubmit() {
   display: flex;
   justify-content: space-between;
   padding: 0.5rem 0;
-  color: #a0aec0;
+  color: var(--color-text-secondary);
 }
 
 .stat-value {
-  color: #fff;
+  color: var(--color-text);
   text-transform: capitalize;
 }
 </style>
