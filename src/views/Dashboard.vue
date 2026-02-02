@@ -103,6 +103,9 @@ async function saveGitHubToken() {
       <section v-if="authStore.isAdmin" class="admin-section">
         <h2>Admin Quick Actions</h2>
         <div class="admin-actions">
+          <router-link to="/admin/players" class="admin-btn primary">
+            👥 Manage Players
+          </router-link>
           <router-link to="/admin/games" class="admin-btn">
             🎮 Start New Game
           </router-link>
@@ -295,7 +298,8 @@ async function saveGitHubToken() {
 }
 
 .admin-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
 }
 
@@ -305,11 +309,24 @@ async function saveGitHubToken() {
   padding: 1rem 1.5rem;
   border-radius: 8px;
   text-decoration: none;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.2s;
+  text-align: center;
 }
 
 .admin-btn:hover {
   background: #4a5568;
+  transform: translateY(-2px);
+}
+
+.admin-btn.primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.admin-btn.primary:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
 .github-section {
