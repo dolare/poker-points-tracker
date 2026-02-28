@@ -32,15 +32,21 @@
     },
     {
       "id": 4,
-      "name": "斗地主",
+      "name": "æå°ä¸»",
       "basePoints": 200,
       "createdAt": "2026-02-28T02:08:39.098Z"
+    },
+    {
+      "id": 5,
+      "name": "Fight the Landlord",
+      "basePoints": 200,
+      "createdAt": "2026-02-28T02:14:09.401Z"
     }
   ],
   "games": [],
   "nextIds": {
     "player": 2,
-    "template": 5,
+    "template": 6,
     "game": 1
   }
 }
