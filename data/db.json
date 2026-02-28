@@ -9,6 +9,14 @@
       "email": "admin@poker.com",
       "role": "admin",
       "createdAt": "2026-02-01T00:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "name": "Chulian",
+      "email": "zhangchulian@gmail.com",
+      "role": "player",
+      "createdAt": "2026-02-28T02:18:01.974Z",
+      "password": "123321"
     }
   ],
   "templates": [
@@ -32,7 +40,7 @@
     },
     {
       "id": 4,
-      "name": "æå°ä¸»",
+      "name": "Ã¦ÂÂÃ¥ÂÂ°Ã¤Â¸Â»",
       "basePoints": 200,
       "createdAt": "2026-02-28T02:08:39.098Z"
     },
@@ -45,7 +53,7 @@
   ],
   "games": [],
   "nextIds": {
-    "player": 2,
+    "player": 3,
     "template": 6,
     "game": 1
   }
