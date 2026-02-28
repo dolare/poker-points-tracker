@@ -156,7 +156,8 @@ function getDefaultData() {
     nextIds: {
       player: 2,
       template: 4,
-      game: 1
+      game: 1,
+      round: 1
     }
   }
 }

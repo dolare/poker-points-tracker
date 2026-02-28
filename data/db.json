@@ -121,12 +121,14 @@
           "name": "wayne Qiang",
           "score": 200
         }
-      ]
+      ],
+      "rounds": []
     }
   ],
   "nextIds": {
     "player": 7,
     "template": 6,
-    "game": 2
+    "game": 2,
+    "round": 1
   }
 }
