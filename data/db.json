@@ -25,6 +25,14 @@
       "role": "player",
       "createdAt": "2026-02-28T02:18:10.904Z",
       "password": "123321"
+    },
+    {
+      "id": 4,
+      "name": "lailai",
+      "email": "lailai@gmail.com",
+      "role": "player",
+      "createdAt": "2026-02-28T02:18:23.932Z",
+      "password": "123321"
     }
   ],
   "templates": [
@@ -61,7 +69,7 @@
   ],
   "games": [],
   "nextIds": {
-    "player": 4,
+    "player": 5,
     "template": 6,
     "game": 1
   }
