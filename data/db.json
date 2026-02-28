@@ -17,6 +17,14 @@
       "role": "player",
       "createdAt": "2026-02-28T02:18:01.974Z",
       "password": "123321"
+    },
+    {
+      "id": 3,
+      "name": "Ray Yin",
+      "email": "dolarebrave@gmail.com",
+      "role": "player",
+      "createdAt": "2026-02-28T02:18:10.904Z",
+      "password": "123321"
     }
   ],
   "templates": [
@@ -53,7 +61,7 @@
   ],
   "games": [],
   "nextIds": {
-    "player": 3,
+    "player": 4,
     "template": 6,
     "game": 1
   }
