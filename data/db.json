@@ -41,6 +41,14 @@
       "role": "player",
       "createdAt": "2026-02-28T02:19:10.931Z",
       "password": "123321"
+    },
+    {
+      "id": 6,
+      "name": "Carrie Zhang",
+      "email": "carrie@gmail.com",
+      "role": "player",
+      "createdAt": "2026-02-28T02:19:25.610Z",
+      "password": "123321"
     }
   ],
   "templates": [
@@ -77,7 +85,7 @@
   ],
   "games": [],
   "nextIds": {
-    "player": 6,
+    "player": 7,
     "template": 6,
     "game": 1
   }
