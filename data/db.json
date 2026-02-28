@@ -29,12 +29,18 @@
       "name": "Board Game Night",
       "basePoints": 100,
       "createdAt": "2026-02-01T00:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "name": "斗地主",
+      "basePoints": 200,
+      "createdAt": "2026-02-28T02:08:39.098Z"
     }
   ],
   "games": [],
   "nextIds": {
     "player": 2,
-    "template": 4,
+    "template": 5,
     "game": 1
   }
 }
