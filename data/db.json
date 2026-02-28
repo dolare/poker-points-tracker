@@ -72,7 +72,7 @@
     },
     {
       "id": 4,
-      "name": "Ã¦ÂÂÃ¥ÂÂ°Ã¤Â¸Â»",
+      "name": "ÃÂ¦ÃÂÃÂÃÂ¥ÃÂÃÂ°ÃÂ¤ÃÂ¸ÃÂ»",
       "basePoints": 200,
       "createdAt": "2026-02-28T02:08:39.098Z"
     },
@@ -83,10 +83,50 @@
       "createdAt": "2026-02-28T02:16:12.829Z"
     }
   ],
-  "games": [],
+  "games": [
+    {
+      "id": 1,
+      "name": "poker_test_1",
+      "templateId": 5,
+      "status": "active",
+      "createdAt": "2026-02-28T02:20:27.631Z",
+      "players": [
+        {
+          "id": 1,
+          "name": "Admin",
+          "score": 200
+        },
+        {
+          "id": 2,
+          "name": "Chulian",
+          "score": 200
+        },
+        {
+          "id": 3,
+          "name": "Ray Yin",
+          "score": 200
+        },
+        {
+          "id": 4,
+          "name": "lailai",
+          "score": 200
+        },
+        {
+          "id": 6,
+          "name": "Carrie Zhang",
+          "score": 200
+        },
+        {
+          "id": 5,
+          "name": "wayne Qiang",
+          "score": 200
+        }
+      ]
+    }
+  ],
   "nextIds": {
     "player": 7,
     "template": 6,
-    "game": 1
+    "game": 2
   }
 }
